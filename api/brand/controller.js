@@ -23,11 +23,11 @@ const getBrands = async (req, res) => {
 };
 
 const postBrand = async (req, res) => {
-  const { name, description,image } = req.body;
+  const { name, description,image} = req.body;
   try {
-    if (name && description && image) {
+    if (name && description && image ) {
       await mongoose.connect(process.env.MONGO_URL)
-      await Brand.create({ name, description , image })
+      await Brand.create({ name, description,image })
       res.status(201).json({
         message: "brand Add Successfully"
       })
@@ -105,7 +105,7 @@ const updateBrand = async (req, res) => {
   const update = { name, image };
 
   try {
-      await connect(process.env.MONGO_URI)
+      await connect(process.env.MONGO_URL)
       await Brand.findOneAndUpdate(filter, update, {
           new: true
       })

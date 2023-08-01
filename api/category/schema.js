@@ -1,16 +1,34 @@
-const { Schema, model } = require('mongoose');
+// const { Schema, model } = require('mongoose');
 
-const CategorySchema = new Schema({
-  name: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  description: {
-    type: String,
-    required: true,
-  }
-});
+// const CategorySchema = new Schema({
+//   CategoryName: {
+//     type: String,
+//     required: true,
+//     unique: true,
+//   },
+//   CategoryImage: {
+//     type: String,
+//     required: true,
+//   }
+// });
 
-const Category = model("category", CategorySchema);
-module.exports = Category;
+// const Category = model("category", CategorySchema);
+// module.exports = Category;
+const { Schema, model } = require('mongoose')
+
+const CategorySchema = new Schema(
+    {
+        CategoryName: {
+            type: String,
+            unique: true,
+            required: true
+        },
+        CategoryImage: {
+            type: String,
+            required: true
+        }
+    }
+)
+
+const Category = model('category', CategorySchema)
+module.exports = Category
