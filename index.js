@@ -4,10 +4,13 @@ const app = express()
 require('dotenv').config()
 const port = process.env.SERVER_PORT
 const mongoose = require('mongoose')
-
+const cors = require('cors')
 
 app.use(express.json())
-
+app.use(cors({
+    origin: ["http://localhost:5173"],
+    credentials: true,
+  }))
 app.use('/api', require('./api/users/router'))
 app.use('/api', require('./api/products/router'))
 app.use('/api', require('./api/category/router'))
