@@ -10,8 +10,7 @@ app.use(express.json())
 
 app.use('/api', require('./api/users/router'))
 app.use('/api', require('./api/products/router'))
-app.use('/api', require('./api/category/router'))
-app.use('/api',require('./api/brand/router'))
+// app.use('/api', require('./api/catogry/router'))
 
 // mongoose.connect(process.env.MONGO_URL)
 // .then(()=>console.log("DB CONNECTED"))
@@ -21,7 +20,7 @@ app.get('/', (req, res) => {
 })
 
 
-// mongoose.connect(process.env.MONGO_URL)
+// mongoose.connect(process.env.MONGO_URI)
 //     .then(() => console.log("DB Connected"))
 //     .catch((err) => console.log(err.message))
 

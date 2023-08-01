@@ -1,55 +1,184 @@
-const getProducts = (req, res) => {
-    res.json({
-        products: [
-            {
-                "id": 1,
-                "title": "iPhone 9",
-                "description": "An apple mobile which is nothing like apple",
-                "price": 549,
-                "discountPercentage": 12.96,
-                "rating": 4.69,
-                "stock": 94,
-                "brand": "Apple",
-                "category": "smartphones",
-                "thumbnail": "https://i.dummyjson.com/data/products/1/thumbnail.jpg",
-                "images": [
-                    "https://i.dummyjson.com/data/products/1/1.jpg",
-                    "https://i.dummyjson.com/data/products/1/2.jpg",
-                    "https://i.dummyjson.com/data/products/1/3.jpg",
-                    "https://i.dummyjson.com/data/products/1/4.jpg",
-                    "https://i.dummyjson.com/data/products/1/thumbnail.jpg"
-                ]
-            },
-            {
-                "id": 2,
-                "title": "iPhone X",
-                "description": "SIM-Free, Model A19211 6.5-inch Super Retina HD display with OLED technology A12 Bionic chip with ...",
-                "price": 899,
-                "discountPercentage": 17.94,
-                "rating": 4.44,
-                "stock": 34,
-                "brand": "Apple",
-                "category": "smartphones",
-                "thumbnail": "https://i.dummyjson.com/data/products/2/thumbnail.jpg",
-                "images": [
-                    "https://i.dummyjson.com/data/products/2/1.jpg",
-                    "https://i.dummyjson.com/data/products/2/2.jpg",
-                    "https://i.dummyjson.com/data/products/2/3.jpg",
-                    "https://i.dummyjson.com/data/products/2/thumbnail.jpg"
-                ]
-            },
-        ]
+const Products = require('./schema')
+const mongoose = require('mongoose')
+require('dotenv').config()
 
+const getProducts =async (req, res) => {
+  try {
+      await mongoose.connect(process.env.MONGO_URL)
+      const products = await Products.find()
+      res.json(
+          {
+            products
+          }
+      )
+
+  }
+
+  catch (error) {
+      res.json(
+          {
+              message: error.message
+          }
+      )
+
+  }
+}
+
+const postProducts = async (req, res) => {
+  const { name, price, category, brand, image, description } = req.body;
+  try {
+    if (name && price && category && brand && image && description) {
+      await mongoose.connect(process.env.MONGO_URL)
+      await Products.create({ name, price, category, brand, image, description })
+      res.status(201).json({
+        message: "Product Add Successfully"
+      })
+    }
+
+    else {
+      res.status(403).json({
+        message: "Required Fields"
+      })
+    }
+  }
+  catch (error) {
+    res.json({
+      message: error.message
     })
+  }
+
+};
+
+const getProductbyID = async (req, res) => {
+
+  const { _id } = req.params
+
+
+  try {
+      await mongoose.connect(process.env.MONGO_URL)
+      const products = await Products.findOne({ _id})
+      res.json(
+          {
+              products
+          }
+      )
+
+  }
+
+  catch (error) {
+      res.json(
+          {
+              message: error.message
+          }
+      )
+
+  }
+};
+
+const getProductbyCategory = async (req, res) => {
+
+  const { category } = req.params
+
+
+  try {
+      await mongoose.connect(process.env.MONGO_URL)
+      const products = await Products.find({ category})
+      res.json(
+          {
+              products
+          }
+      )
+
+  }
+
+  catch (error) {
+      res.json(
+          {
+              message: error.message
+          }
+      )
+
+  }
+};
+const getProductbyBrand = async (req, res) => {
+
+  const { brand } = req.params
+
+
+  try {
+      await mongoose.connect(process.env.MONGO_URL)
+      const products = await Products.find({ brand})
+      res.json(
+          {
+              products
+          }
+      )
+
+  }
+
+  catch (error) {
+      res.json(
+          {
+              message: error.message
+          }
+      )
+
+  }
+};
+const  DelPro = async (req, res) => {
+  const { name, _id } = req.body
+  try {
+    await mongoose.connect(process.env.MONGO_URL)
+   await Products.deleteOne({name,_id})
+   const products = await Products.find()
+    res.json(
+      {
+        products,
+        message : "succesfully deleted"
+      }
+    )
+  }
+  catch (error) {
+    res.json(
+      {
+        message: error.message
+      }
+    )
+
+  }
+};
+
+const updatePro = async (req, res) => {
+
+  const { _id, name, price, category, brand, image, description } = req.body
+
+  const filter = { _id };
+  const update = { name,price, category, brand, image, description };
+
+  try {
+      await connect(process.env.MONGO_URL)
+      await Products.findOneAndUpdate(filter, update, {
+          new: true
+      })
+
+      const products = await Products.find()
+
+      res.json({
+          message: "Success",
+          products
+      })
+
+  }
+
+  catch (error) {
+      res.json({
+          message: error.message,
+      })
+  }
 }
 
 
-const postProducts = (req, res) => {
-    res.json({
-        message: "Product Added Successfully"
-    })
-
-}
 
 
-module.exports = { getProducts, postProducts }
+
+module.exports = { getProducts, postProducts,getProductbyID,DelPro,getProductbyCategory,getProductbyBrand,updatePro};
