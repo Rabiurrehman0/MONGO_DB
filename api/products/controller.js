@@ -77,12 +77,12 @@ const getProductbyID = async (req, res) => {
 
 const getProductbyCategory = async (req, res) => {
 
-  const { category } = req.params
+  const {category} = req.params
 
 
   try {
       await mongoose.connect(process.env.MONGO_URL)
-      const products = await Products.find({ category})
+      const products = await Products.findone({category})
       res.json(
           {
               products
@@ -107,10 +107,10 @@ const getProductbyBrand = async (req, res) => {
 
   try {
       await mongoose.connect(process.env.MONGO_URL)
-      const products = await Products.find({ brand})
+      const products = await Products.findOne({ brand})
       res.json(
           {
-              products
+              Products : products
           }
       )
 
@@ -149,17 +149,17 @@ const  DelPro = async (req, res) => {
 };
 
 const updatePro = async (req, res) => {
-
   const { _id, name, price, category, brand, image, description } = req.body
 
   const filter = { _id };
-  const update = { name,price, category, brand, image, description };
+  const update = {name, price, category, brand, image, description };
 
   try {
       await connect(process.env.MONGO_URL)
+
       await Products.findOneAndUpdate(filter, update, {
           new: true
-      })
+      });
 
       const products = await Products.find()
 
@@ -170,12 +170,42 @@ const updatePro = async (req, res) => {
 
   }
 
+
   catch (error) {
-      res.json({
-          message: error.message,
+      res.status(400).json({
+          message: error.message
       })
   }
+
 }
+// const updatePro = async (req, res) => {
+
+//   const { _id, name, price, category, brand, image, description } = req.body
+
+//   const filter = { _id };
+//   const update = { name,price, category, brand, image, description };
+
+//   try {
+//       await connect(process.env.MONGO_URL)
+//       await Products.findOneAndUpdate(filter, update, {
+//           new: true
+//       })
+
+//       const products = await Products.find()
+
+//       res.json({
+//           message: "Success",
+//           products
+//       })
+
+//   }
+
+//   catch (error) {
+//       res.json({
+//           message: error.message,
+//       })
+//   }
+// }
 
 
 
