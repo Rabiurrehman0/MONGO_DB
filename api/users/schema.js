@@ -21,14 +21,13 @@ const UserSchema = new Schema(
             required: true,
             default: "user"
         },
+        profile:{
+            type:String,
+            default : "https://cdn-icons-png.flaticon.com/512/6522/6522516.png"
+        },
         joining: {
             type: Date,
             default: Date.now
-        }
-        ,profile_pic:{
-            type: String,
-            default: "https://cdn-icons-png.flaticon.com/512/666/666201.png"
-
         }
 
     }

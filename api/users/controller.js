@@ -13,38 +13,23 @@ const Dummy = (req, res) => {
 
 const SignUp = async (req, res) => {
     const { username, password, email } = req.body;
-    console.log({ username, password, email })
     try {
-
-
-        if (!username || !password || !email) {
-            res.status(403).json({
-                message: "Required Fields"
+        await mongoose.connect(process.env.MONGO_URI)
+        console.log("DB Connected")
+        const existingUser = await User.exists({ email: email })
+        if (existingUser) {
+            res.status(208).json({
+                message: "User Already Exists"
             })
-
         }
-
 
         else {
-            await mongoose.connect(process.env.MONGO_URL)
-            console.log("DB Connected")
-            const existingUser = await User.exists({ email: email })
-            if (existingUser) {
-                res.status(208).json({
-                    message: "User Already Exists"
-                })
-            }
-
-            else {
-                await User.create({ username, email, password: await hash(password, 12) })
-                console.log("User Created")
-                res.status(201).json({
-                    message: "Signup Successfully"
-                })
-            }
+            await User.create({ username, email, password: await hash(password, 12) })
+            console.log("User Created")
+            res.status(201).json({
+                message: "Signup Successfully"
+            })
         }
-
-
     }
     catch (error) {
         res.json({
@@ -58,7 +43,7 @@ const Login = async (req, res) => {
     const { password, email } = req.body;
 
     try {
-        await mongoose.connect(process.env.MONGO_URL)
+        await mongoose.connect(process.env.MONGO_URI)
         const existingUser = await User.findOne({ email: email })
 
         if (!existingUser) {
@@ -75,7 +60,9 @@ const Login = async (req, res) => {
                     {
                         id: existingUser._id,
                         username: existingUser.username,
-                        email: existingUser.email
+                        email: existingUser.email,
+                        profile : existingUser.profile,
+                        role : existingUser.role
                     }
                     ,
                     process.env.JWT_SECRET
@@ -110,7 +97,7 @@ const Login = async (req, res) => {
 
 const allUsers = async (req, res) => {
     try {
-        await mongoose.connect(process.env.MONGO_URL)
+        await mongoose.connect(process.env.MONGO_URI)
         const Users = await User.find()
         res.json(
             {
@@ -137,7 +124,7 @@ const getUserbyEmail = async (req, res) => {
 
 
     try {
-        await mongoose.connect(process.env.MONGO_URL)
+        await mongoose.connect(process.env.MONGO_URI)
         const Users = await User.findOne({ email: email })
         res.json(
             {
@@ -157,14 +144,13 @@ const getUserbyEmail = async (req, res) => {
     }
 }
 
-
 const userbyEmail = async (req, res) => {
 
     const { email } = req.query
 
 
     try {
-        await mongoose.connect(process.env.MONGO_URL)
+        await mongoose.connect(process.env.MONGO_URI)
         const Users = await User.findOne({ email: email })
         res.json(
             {
@@ -183,64 +169,73 @@ const userbyEmail = async (req, res) => {
 
     }
 };
-const  DelUser = async (req, res) => {
-    const { name, _id } = req.body
-    try {
-      await mongoose.connect(process.env.MONGO_URL)
-     await User.deleteOne({name,_id})
-     const user = await User.find()
-      res.json(
-        {
-          user,
-          message : "succesfully deleted"
-        }
-      )
+const deleteUser = async (req, res) => {
+    const { _id } = req.body;
+
+    if (!_id) {
+        res.status(400).json({
+            message: "Please give the user ID"
+        })
     }
-    catch (error) {
-      res.json(
-        {
-          message: error.message
+
+    else {
+        try {
+            await connect(process.env.MONGO_URL)
+            await User.deleteOne({ _id })
+            const allusers = await User.find()
+
+            res.json({
+                message: "Successfully Deleted",
+                users: allusers
+            })
+
+
+        } catch (error) {
+            res.status(400).json({
+                message: error.message
+            })
+
         }
-      )
-  
     }
-  };
-  
-  const updateUser = async (req, res) => {
-  
-    const { _id,username, password, email} = req.body
-  
+
+}
+
+const updateUser = async (req, res) => {
+    const { _id,username, password, email } = req.body;
+
     const filter = { _id };
-    const update = { username, password, email };
-  
-    try {
-        await connect(process.env.MONGO_URL)
-        await User.findOneAndUpdate(filter, update, {
-            new: true
-        })
-  
-        const user = await User.find()
-  
-        res.json({
-            message: "Success",
-            user
-        })
-  
-    }
-  
-    catch (error) {
-        res.json({
-            message: error.message,
+    const update = {username, password, email};
+
+
+
+
+    if (!_id) {
+        res.status(400).json({
+            message: "Please give the user ID"
         })
     }
-  }
-  
-  
-  
-  
-  
-  
+
+    else {
+        try {
+            await connect(process.env.MONGO_URL)
+            const users = await Character.findOneAndUpdate(filter, update, { new: true });
+
+            res.json({
+                message: "Sucess",
+                users
+            })
 
 
 
-module.exports = { Dummy, SignUp, Login, allUsers, getUserbyEmail, userbyEmail , DelUser,updateUser }
+        } catch (error) {
+            res.status(400).json({
+                message: error.message
+            })
+
+        }
+    }
+
+}
+
+
+module.exports = { Dummy, SignUp, Login, allUsers, getUserbyEmail, userbyEmail,deleteUser ,updateUser}

@@ -11,10 +11,13 @@ app.use(cors({
     origin: ["http://localhost:5173"],
     credentials: true,
   }))
-app.use('/api', require('./api/users/router'))
-app.use('/api', require('./api/products/router'))
-app.use('/api', require('./api/category/router'))
-app.use('/api',require('./api/brand/router'))
+  app.use('/api', require('./api/users/router'))
+  app.use('/api', require('./api/products/router'))
+  app.use('/api', require('./api/brands/router'))
+  app.use('/api', require('./api/category/router'))
+  app.use('/api', require('./api/mailer/router'))
+  app.use('/api', require('./api/orders/router'))
+  
 
 // mongoose.connect(process.env.MONGO_URL)
 // .then(()=>console.log("DB CONNECTED"))
